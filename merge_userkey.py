@@ -2,14 +2,13 @@ import streamlit as st
 import requests
 import numpy as np
 from huggingface_hub import InferenceClient
-
+from deep_translator import GoogleTranslator
 
 # Function to get or set the API key
 def get_api_key():
     if 'api_key' not in st.session_state:
         st.session_state.api_key = ''
     return st.session_state.api_key
-
 
 # Sidebar for API key input
 st.sidebar.title("Hugging Face API Key")
@@ -23,7 +22,6 @@ bert_models = {
     "Twitter XLM RoBERTa": "https://api-inference.huggingface.co/models/cardiffnlp/twitter-xlm-roberta-base-sentiment"
 }
 
-
 # Initialize the Hugging Face Inference Client for Mistral LLM
 @st.cache_resource
 def get_mistral_client():
@@ -32,12 +30,10 @@ def get_mistral_client():
         token=st.session_state.api_key
     )
 
-
 def query_bert(payload, model_url):
     headers = {"Authorization": f"Bearer {st.session_state.api_key}"}
     response = requests.post(model_url, headers=headers, json=payload)
     return response.json()
-
 
 def get_bert_sentiment(text, model_url):
     output = query_bert({"inputs": text}, model_url)
@@ -54,7 +50,6 @@ def get_bert_sentiment(text, model_url):
         return result
     else:
         return {"error": "Unexpected output format"}
-
 
 def get_mistral_sentiment(text):
     client = get_mistral_client()
@@ -73,7 +68,6 @@ Neutral phrases: [list of neutral phrases]
     response = client.text_generation(prompt, max_new_tokens=500, temperature=0.2)
     return response
 
-
 def parse_mistral_response(response):
     lines = response.split('\n')
     scores = {}
@@ -90,6 +84,8 @@ def parse_mistral_response(response):
                 phrases[sentiment] = [phrase.strip() for phrase in value.strip('[]').split(',')]
     return scores, phrases
 
+def translate_to_hebrew(text):
+    return GoogleTranslator(source='en', target='hebrew').translate(text)
 
 st.title("Sentiment Analysis App")
 
@@ -120,7 +116,8 @@ if st.button("Analyze Sentiment"):
         elif selected_model == "Combined BERT":
             results = {}
             for model_name, model_url in bert_models.items():
-                sentiment_scores = get_bert_sentiment(user_input, model_url)
+                text_to_analyze = translate_to_hebrew(user_input) if model_name == "heBERT" else user_input
+                sentiment_scores = get_bert_sentiment(text_to_analyze, model_url)
                 results[model_name] = sentiment_scores
                 
                 st.write(f"{model_name}:")
@@ -139,7 +136,8 @@ if st.button("Analyze Sentiment"):
             st.write(f"  Neutral: {avg_neutral:.4f}")
             st.write(f"  Negative: {avg_negative:.4f}")
         else:
-            sentiment_scores = get_bert_sentiment(user_input, bert_models[selected_model])
+            text_to_analyze = translate_to_hebrew(user_input) if selected_model == "heBERT" else user_input
+            sentiment_scores = get_bert_sentiment(text_to_analyze, bert_models[selected_model])
             st.write("Sentiment Scores:")
             st.write(f"  Positive: {sentiment_scores.get('positive', 'N/A') if isinstance(sentiment_scores.get('positive', 'N/A'), str) else sentiment_scores.get('positive'):.4f}")
             st.write(f"  Neutral: {sentiment_scores.get('neutral', 'N/A') if isinstance(sentiment_scores.get('neutral', 'N/A'), str) else sentiment_scores.get('neutral'):.4f}")
