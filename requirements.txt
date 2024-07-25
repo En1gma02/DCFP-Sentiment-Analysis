@@ -1,7 +1,4 @@
 streamlit
 requests
-transformers
-torch
-numpy
-sentencepiece
 huggingface_hub
+deep-translator
