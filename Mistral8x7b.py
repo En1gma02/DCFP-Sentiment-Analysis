@@ -4,7 +4,7 @@ from huggingface_hub import InferenceClient
 # Initialize the Hugging Face Inference Client
 client = InferenceClient(
     "mistralai/Mixtral-8x7B-Instruct-v0.1",
-    token="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"
+    token="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 )
 
 def get_sentiment(text):
