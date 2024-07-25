@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+from deep_translator import GoogleTranslator
 
 # Set up the API endpoint and headers
 API_URL = "https://api-inference.huggingface.co/models/avichr/heBERT_sentiment_analysis"
@@ -21,10 +22,20 @@ def main():
     if st.button("Analyze Sentiment"):
         if user_input:
             with st.spinner("Analyzing..."):
-                result = query({"inputs": user_input})
+                # Translate from English to Hebrew
+                hebrew_input = GoogleTranslator(source='en', target='haw').translate(user_input)
+                
+                result = query({"inputs": hebrew_input})
+                
                 # Display the sentiment analysis result
                 st.write("Sentiment Analysis Result:")
                 st.json(result)
+        else:
+            st.warning("Please enter a sentence or tweet to analyze.")
+
+if __name__ == "__main__":
+    main()
+
         else:
             st.warning("Please enter a sentence or tweet to analyze.")
 
