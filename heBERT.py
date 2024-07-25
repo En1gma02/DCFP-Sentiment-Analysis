@@ -3,7 +3,7 @@ import requests
 
 # Set up the API endpoint and headers
 API_URL = "https://api-inference.huggingface.co/models/avichr/heBERT_sentiment_analysis"
-headers = {"Authorization": "Bearer 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"}
+headers = {"Authorization": "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
 
 # Function to query the Hugging Face API
 def query(payload):
