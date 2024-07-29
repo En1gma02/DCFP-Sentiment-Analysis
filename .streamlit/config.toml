@@ -1,7 +1,7 @@
 [theme]
-primaryColor="#00CED1"  # Turquoise
-backgroundColor="#2F2F2F"
-secondaryBackgroundColor="#404040"
+primaryColor="#005866"  # Turquoise
+backgroundColor="#00012b"
+secondaryBackgroundColor="#03292f"
 textColor="#FFFFFF"
 font="sans serif"
 
